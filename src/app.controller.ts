@@ -3,8 +3,11 @@ import { AppService } from './app.service';
 import { AuthService } from './auth/auth.service';
 import { LocalAuthGuard } from './auth/local-auth.guard';
 import { JwtAuthGuard } from './auth/jwt-auth.guard';
+import { Role } from './enums/role.enum';
+import { RolesGuard } from './auth/roles.guard';
+import { Roles } from './auth/roles.decorators';
 
-@Controller()
+@Controller('/')
 export class AppController {
   constructor(
     private readonly appService: AppService,
@@ -22,8 +25,15 @@ export class AppController {
   }
 
   @UseGuards(JwtAuthGuard)
-  @Get('profile')
+  @Get('/profile')
   getProfle(@Request() req) {
     return req.user;
+  }
+
+  @UseGuards( JwtAuthGuard, RolesGuard )
+  @Roles(Role.Admin)
+  @Get('/api/test/user')
+  getProtected() {
+    return 'protected data';
   }
 }
